@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Library Seat & Resource Booking System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f0;--card:#fff;--tx:#14262a;--mu:#5d6f73;--bd:#d5ddda;--pr:#17494d;--g:#1f9d62;--r:#d64545;--b:#2f6fdd;--p:#8b4fd1;--gr:#9aa5a8;--br:#b8862b}
+[data-theme=dark]{--bg:#0c1a1d;--card:#142a2e;--tx:#e6efee;--mu:#8fa5a8;--bd:#264247;--pr:#3fa7a0}
+*{box-sizing:border-box;margin:0}
+body{font:14px/1.5 Inter,system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+button,input,select{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:10px;padding:10px 20px;background:var(--card);border-bottom:2px solid var(--pr);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.brand{font-weight:700;font-size:17px;color:var(--pr)}
+nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+nav button,.btn,.ic{border:0;padding:8px 14px;border-radius:8px;background:transparent;cursor:pointer;transition:background .2s,transform .1s}
+nav button:hover,.ic:hover{background:var(--bd)}
+nav button.on{background:var(--pr);color:#fff}
+.btn{background:var(--pr);color:#fff;font-weight:500}.btn:hover{filter:brightness(1.15)}.btn:active{transform:scale(.97)}
+.btn.s{background:var(--bd);color:var(--tx)}.btn.d{background:var(--r);color:#fff}.btn.sm{padding:4px 10px;font-size:12px}
+main{max-width:1150px;margin:20px auto;padding:0 16px}
+h2,h3{margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.grid .card{margin:0}
+input,select{padding:8px 10px;border:1px solid var(--bd);border-radius:6px;background:var(--card)}
+:focus-visible{outline:2px solid var(--br);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}.card>.row:last-child{margin-bottom:0}
+.mu,small{color:var(--mu)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
+.seats{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:8px}
+.seat{height:44px;border:0;border-radius:6px 6px 14px 14px;color:#fff;font-weight:600;font-size:12px;cursor:pointer;transition:transform .15s}
+.seat:hover{transform:translateY(-3px)}
+.free{background:var(--g)}.occ{background:var(--r)}.sel{background:var(--b)}.mine{background:var(--p)}.maint{background:var(--gr)}
+.occ,.maint{cursor:not-allowed}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.bg-g{background:#d5f2e3;color:#115c38}.bg-r{background:#fbdcdc;color:#8a1f1f}.bg-b{background:#dbe7fb;color:#1a4aa0}.bg-y{background:#fbefcf;color:#7a5410}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--bd);vertical-align:middle}th{color:var(--mu);font-weight:600}
+.tw{overflow-x:auto}
+.stat b{font-size:28px;display:block;color:var(--pr)}
+.bars{display:flex;gap:6px;height:150px}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:11px}
+.bar{width:100%;background:var(--pr);border-radius:4px 4px 0 0;min-height:2px}.bar.pk{background:var(--br)}
+.hb{display:flex;align-items:center;gap:10px;margin:8px 0}.hb span{width:130px}.hb b{width:42px;text-align:right}
+.track{flex:1;height:12px;background:var(--bd);border-radius:6px;overflow:hidden}.track i{display:block;height:100%;background:var(--pr)}
+.auth{max-width:430px;margin:30px auto}
+.auth label,.mb label{display:block;margin:8px 0;font-weight:500}
+.auth input,.mb input,.mb select{width:100%;margin-top:4px}
+.bw{position:relative}
+.cnt{position:absolute;top:0;right:0;background:var(--r);color:#fff;border-radius:99px;font-size:10px;padding:0 5px}
+.panel{position:absolute;right:0;top:44px;width:320px;max-width:90vw;max-height:60vh;overflow:auto;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.nt{padding:8px;border-radius:6px;cursor:pointer;display:flex;flex-direction:column}.nt.un{background:var(--bg);border-left:3px solid var(--br)}
+#ts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:60}
+.toast{background:var(--pr);color:#fff;padding:10px 16px;border-radius:8px;max-width:320px;animation:in .25s}
+.toast.e{background:var(--r)}.toast.s{background:var(--g)}
+@keyframes in{from{opacity:0;transform:translateX(20px)}}
+#md{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.mb{background:var(--card);border-radius:12px;padding:22px;width:100%;max-width:420px;max-height:90vh;overflow:auto}
+.empty{padding:24px;text-align:center;color:var(--mu)}
+@media(max-width:600px){header{padding:8px 10px}.hb span{width:90px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header id="hd"></header>
+<main id="mn"></main>
+<div id="md"></div>
+<div id="ts" aria-live="polite"></div>
+<script>
+/* ===== Core helpers & state ===== */
+const K='lbs1',M=60000,$=s=>document.querySelector(s),P=n=>String(n).padStart(2,'0');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const dstr=(t=Date.now())=>{const d=new Date(t);return d.getFullYear()+'-'+P(d.getMonth()+1)+'-'+P(d.getDate())};
+const tm=t=>{const d=new Date(t);return P(d.getHours())+':'+P(d.getMinutes())};
+const T=(h,d=ds)=>new Date(d+'T00:00:00').getTime()+h*3600000;
+const LS={g:k=>{try{return localStorage.getItem(k)}catch(e){return null}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const live=b=>b.status=='booked'||b.status=='checkedin';
+const STS=['Upcoming','Awaiting check-in','Active','Completed','Cancelled','Auto-released','Force-released'];
+const V={};
+let D,me=null,view='auth',sel=null,fz='All',ds=dstr(),sl='0',np=false,reg=false;
+let th=LS.g('lbs-th')||'light';
+const bf={st:'',dt:''},rf={q:'',ty:'',av:''},ad={q:'',st:''};
+const I=id=>D.items.find(i=>i.id==id),U=id=>D.users.find(u=>u.id==id);
+const nmOf=id=>(I(id)||{name:id}).name;
+const el=(f,k)=>f.elements[k].value;
+function save(){LS.s(K,JSON.stringify(D))}
+
+/* ===== Seed demo data ===== */
+function seed(){
+  const n=Date.now(),h=3600000,items=[];
+  for(let i=1;i<=16;i++)items.push({id:'A'+i,type:'seat',zone:'Silent Zone',name:'A'+i,cap:1,am:i<=8?'Window, Power outlet':'Power outlet',maint:i==16});
+  for(let i=1;i<=10;i++)items.push({id:'B'+i,type:'seat',zone:'Group Study Area',name:'B'+i,cap:1,am:'Shared table, Power outlet',maint:false});
+  for(let i=1;i<=10;i++)items.push({id:'C'+i,type:'seat',zone:'Computer Zone',name:'C'+i,cap:1,am:'PC, Power outlet',maint:i==10});
+  [['R1','Reading Room 1','Reading Room',12,'AC, Quiet, Power outlets'],['R2','Reading Room 2','Reading Room',20,'AC, Window'],['D1','Discussion Room 1','Discussion Room',6,'Whiteboard, TV'],['D2','Discussion Room 2','Discussion Room',8,'Whiteboard',1],['P1','Projector Room','Projector Room',25,'Projector, Sound system'],['L1','Locker Bank A','Locker',10,'Lockable, Day-use'],['PC1','Research PC Lab','Computer',8,'PCs, Fast internet']]
+    .forEach(r=>items.push({id:r[0],type:'res',name:r[1],zone:r[2],cap:r[3],am:r[4],maint:!!r[5]}));
+  const u=(id,name)=>({id,name,email:id+'@college.edu',pw:'pass123',role:'student',blocked:false});
+  const bk=(uid,item,s,e,st,ci)=>({id:'b'+Math.random().toString(36).slice(2,8),uid,item,start:s,end:e,status:st,ci:ci||null,created:n,r1:1,r2:0});
+  D={items,set:{slot:2,grace:15,max:2,open:8,close:20},session:null,
+    users:[{id:'admin',name:'Administrator',email:'admin@library.edu',pw:'admin123',role:'admin',blocked:false},u('student1','Aarav Sharma'),u('student2','Priya Singh'),u('student3','Rohan Verma')],
+    bookings:[bk('student2','A2',n-30*M,n+90*M,'checkedin',n-25*M),bk('student3','C3',n-20*M,n+100*M,'checkedin',n-15*M),bk('student2','B4',n+60*M,n+180*M,'booked'),bk('student1','A5',n-26*h,n-24*h,'completed',n-26*h),bk('student1','B1',n-50*h,n-48*h,'cancelled')],
+    notes:{student1:[{id:'n0',msg:'Welcome to the Library Booking System!',t:n,read:false}]}};
+  save();
+}
+
+/* ===== Notifications & toasts ===== */
+function toast(m,t='i'){const d=document.createElement('div');d.className='toast '+t;d.textContent=m;$('#ts').append(d);setTimeout(()=>d.remove(),4500)}
+function note(uid,msg){(D.notes[uid]=D.notes[uid]||[]).unshift({id:'n'+Date.now()+Math.random().toString(36).slice(2,5),msg,t:Date.now(),read:false});save();if(me&&me.id==uid)toast(msg)}
+function rd(id){(D.notes[me.id]||[]).forEach(x=>{if(x.id==id)x.read=true});save();render()}
+function rdAll(){(D.notes[me.id]||[]).forEach(x=>x.read=true);save();render()}
+function clr(){D.notes[me.id]=[];save();render()}
+function bell(){
+  const L=D.notes[me.id]||[],u=L.filter(x=>!x.read).length;
+  return `<button class="ic" aria-label="Notifications" onclick="np=!np;render()">🔔${u?`<b class="cnt">${u}</b>`:''}</button>`+(np?`<div class="panel"><div class="row"><b>Notifications</b><button class="btn sm s" onclick="rdAll()">Mark all read</button><button class="btn sm s" onclick="clr()">Clear all</button></div>${L.length?L.slice(0,30).map(x=>`<div class="nt ${x.read?'':'un'}" onclick="rd('${x.id}')">${esc(x.msg)}<small>${dstr(x.t)} ${tm(x.t)}</small></div>`).join(''):'<p class="mu">You have no notifications.</p>'}</div>`:'');
+}
+
+/* ===== Modal ===== */
+function modal(h){$('#md').innerHTML=`<div class="mb" role="dialog" aria-modal="true">${h}</div>`;$('#md').style.display='flex'}
+function closeM(){$('#md').style.display='none';$('#md').innerHTML=''}
+
+/* ===== Auth ===== */
+function login(f){
+  const k=el(f,'u').trim().toLowerCase(),u=D.users.find(x=>(x.id.toLowerCase()==k||x.email.toLowerCase()==k)&&x.pw==el(f,'p'));
+  if(!u){toast('Wrong ID or password','e');return false}
+  if(u.blocked){toast('This account is blocked. Contact the administrator.','e');return false}
+  me=u;D.session=u.id;save();view=u.role=='admin'?'dash':'map';render();return false;
+}
+function regUser(f){
+  const n=el(f,'n').trim(),i=el(f,'i').trim(),e=el(f,'e').trim(),p=el(f,'p');
+  const bad=m=>{const x=document.getElementById('rerr');if(x)x.textContent=m;toast(m,'e');return false};
+  if(n.length<2)return bad('Enter your full name');
+  if(!/^\S{2,}$/.test(i))return bad('Student ID must be at least 2 characters with no spaces');
+  if(!/^\S+@\S+\.\S+$/.test(e))return bad('Enter a valid email address, e.g. name@gmail.com');
+  if(p.length<6)return bad('Password needs at least 6 characters');
+  if(D.users.some(x=>x.id.toLowerCase()==i.toLowerCase()))return bad('That student ID is already registered. Choose another ID or log in.');
+  if(D.users.some(x=>x.email.toLowerCase()==e.toLowerCase()))return bad('That email is already registered. Use another email or log in.');
+  const u={id:i,name:n,email:e,pw:p,role:'student',blocked:false};D.users.push(u);reg=false;me=u;D.session=u.id;view='map';save();note(u.id,'Welcome, '+n+'! Your account is ready. Pick a seat to book.');render();return false;
+}
+function editName(){
+  modal(`<h3>Edit your name</h3><form novalidate onsubmit="return false" data-go="saveName"><label>Full name<input name="n" value="${esc(me.name)}" maxlength="40" autofocus></label><p id="nerr" role="alert" style="color:var(--r);min-height:1.4em"></p><div class="row"><button type="button" class="btn" onclick="saveName(this.form)">Save name</button><button type="button" class="btn s" onclick="closeM()">Cancel</button></div></form>`);
+}
+function saveName(f){
+  const n=el(f,'n').trim().replace(/\s+/g,' ');
+  if(n.length<2){document.getElementById('nerr').textContent='Name must be at least 2 characters';return false}
+  me.name=n;save();closeM();toast('Name updated to '+n,'s');render();return false;
+}
+function logout(){me=null;D.session=null;save();np=false;view='auth';render()}
+V.auth=()=>reg
+ ?`<div class="card auth"><h2>Create account</h2><form novalidate onsubmit="return false" data-go="regUser"><label>Full name<input name="n" autocomplete="name"></label><label>Student ID<input name="i" autocomplete="username"></label><label>Email<input name="e" type="email" autocomplete="email"></label><label>Password (6+ characters)<input name="p" type="password" autocomplete="new-password"></label><p id="rerr" role="alert" style="color:var(--r);font-weight:500;min-height:1.4em"></p><div class="row"><button type="button" class="btn" onclick="regUser(this.form)">Register</button><button type="button" class="btn s" onclick="reg=false;render()">Back to login</button></div></form></div>`
+ :`<div class="card auth"><h2>Library Seat & Resource Booking</h2><p class="mu">Reserve a seat, reading room or resource in advance.</p><form onsubmit="return false" data-go="login"><label>Student ID or email<input name="u" required autofocus></label><label>Password<input name="p" type="password" required></label><div class="row"><button type="button" class="btn" onclick="login(this.form)">Log in</button><button type="button" class="btn s" onclick="reg=true;render()">New student? Create account</button></div></form><p class="mu">Demo: student1 / pass123 &nbsp;·&nbsp; admin / admin123</p><div class="row"><button class="btn" onclick="demo('student1')">Open as student</button><button class="btn s" onclick="demo('admin')">Open as admin</button></div></div>`;
+function demo(id){me=U(id);D.session=id;save();view=me.role=='admin'?'dash':'map';render()}
+
+/* ===== Slots, availability, booking rules ===== */
+function slots(){const S=D.set,a=[];for(let h=S.open;h+S.slot<=S.close;h+=S.slot)a.push([h,h+S.slot]);return a}
+function cur(){if(sl=='now'){const s=Math.floor(Date.now()/M)*M;return[s,s+60*M]}const o=slots()[+sl]||slots()[0];return[T(o[0]),T(o[1])]}
+const busy=(id,s,e)=>D.bookings.find(b=>b.item==id&&live(b)&&b.start<e&&b.end>s);
+function st(it,s,e){if(it.maint)return'maint';const b=busy(it.id,s,e);return b?(b.uid==me.id?'mine':'occ'):'free'}
+const past=o=>ds==dstr()&&T(o[0])+D.set.grace*M<=Date.now();
+function fixSlot(){const a=slots();if(sl=='now'&&ds==dstr())return;const k=a.findIndex(o=>!past(o));if(k<0){ds=dstr(Date.now()+864e5);sl='0'}else if(+sl<k||sl=='now')sl=String(k)}
+const ctrl=()=>`<input type="date" value="${ds}" min="${dstr()}" aria-label="Date" onchange="ds=this.value||dstr();fixSlot();sel=null;render()"><select aria-label="Time slot" onchange="sl=this.value;sel=null;render()">${slots().map((o,i)=>`<option value="${i}" ${sl==i?'selected':''} ${past(o)?'disabled':''}>${P(o[0])}:00 – ${P(o[1])}:00${past(o)?' (passed)':''}</option>`).join('')}<option value="now" ${sl=='now'?'selected':''}>Custom: now, 1 hour</option></select>`;
+function chk(id,s,e){
+  const S=D.set,hs=new Date(s).getHours()+new Date(s).getMinutes()/60,he=(e-T(0,dstr(s)))/3600000;
+  if(me.role=='admin')return'Administrators can only view bookings';
+  if(I(id).maint)return'This item is under maintenance';
+  if(s+S.grace*M<=Date.now())return'That slot has already started or passed';
+  if(hs<S.open||he>S.close)return`The library is open ${P(S.open)}:00 – ${P(S.close)}:00`;
+  if(D.bookings.filter(b=>b.uid==me.id&&live(b)).length>=S.max)return`You have ${S.max} active bookings, the current limit. Cancel one in My Bookings to book another.`;
+  if(busy(id,s,e))return'Already booked for this time';
+}
+function ask(id){
+  const it=I(id),[s,e]=cur(),er=chk(id,s,e);if(er)return toast(er,'e');
+  modal(`<h3>Confirm booking</h3><p><b>${esc(it.name)}</b> — ${esc(it.zone)}</p><p>${dstr(s)}, ${tm(s)} – ${tm(e)}</p><p class="mu">Check in within ${D.set.grace} minutes of the start time or the booking is released automatically.</p><div class="row" style="margin-top:14px"><button class="btn" onclick="doBook('${id}',${s},${e})">Confirm booking</button><button class="btn s" onclick="closeM()">Cancel</button></div>`);
+}
+function doBook(id,s,e){
+  const er=chk(id,s,e);if(er){closeM();return toast(er,'e')}
+  D.bookings.push({id:'b'+Date.now().toString(36),uid:me.id,item:id,start:s,end:e,status:'booked',ci:null,created:Date.now(),r1:s-Date.now()<=10*M,r2:0});
+  closeM();sel=null;note(me.id,`Booking confirmed: ${nmOf(id)}, ${dstr(s)} ${tm(s)}–${tm(e)}`);render();
+}
+function lab(b){const n=Date.now();if(b.status=='booked')return n<b.start?['Upcoming','b']:['Awaiting check-in','y'];return({checkedin:['Active','g'],completed:['Completed','b'],cancelled:['Cancelled','r'],released:['Auto-released','r'],forced:['Force-released','r']})[b.status]}
+function act(a,id){
+  const b=D.bookings.find(x=>x.id==id),n=Date.now(),nm=nmOf(b.item);
+  if(a=='in'){if(n<b.start-10*M)return toast('Check-in opens 10 minutes before the start time','e');b.status='checkedin';b.ci=n;note(b.uid,`Checked in to ${nm}`)}
+  if(a=='out'){b.status='completed';note(b.uid,`${nm} released. Thanks for using the library!`)}
+  if(a=='can'){b.status='cancelled';note(b.uid,`Booking cancelled: ${nm}`)}
+  if(a=='rel'){b.status='forced';note(b.uid,`Your booking for ${nm} was released by an administrator`)}
+  if(a=='ext'){const ne=b.end+60*M;if(ne>T(D.set.close,dstr(b.start)))return toast('Can’t extend past closing time','e');if(busy(b.item,b.end,ne))return toast('The next slot is already booked','e');b.end=ne;b.r2=0;note(b.uid,`${nm} extended to ${tm(ne)}`)}
+  save();render();
+}
+
+/* ===== Automatic release timer (uses stored timestamps, survives reloads) ===== */
+const fmtCd=ms=>{ms=Math.max(0,Math.floor(ms/1000));return(ms>=3600?Math.floor(ms/3600)+':':'')+P(Math.floor(ms/60)%60)+':'+P(ms%60)};
+function tick(){
+  if(!D)return;const n=Date.now(),g=D.set.grace*M;let ch=0;
+  D.bookings.forEach(b=>{
+    const nm=nmOf(b.item);
+    if(b.status=='booked'&&n>b.start+g){b.status='released';note(b.uid,`${nm} was auto-released: no check-in within ${D.set.grace} minutes`);ch=1}
+    else if(b.status=='checkedin'&&n>=b.end){b.status='completed';note(b.uid,`Your time for ${nm} has ended. It is now released.`);ch=1}
+    else if(b.status=='booked'&&!b.r1&&b.start-n<=10*M){b.r1=1;note(b.uid,`Reminder: ${nm} starts at ${tm(b.start)}`);ch=1}
+    else if(b.status=='checkedin'&&!b.r2&&b.end-n<=5*M){b.r2=1;note(b.uid,`Reminder: your booking for ${nm} ends in 5 minutes. You can extend it.`);ch=1}
+  });
+  if(ch){save();render()}
+  document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=fmtCd(e.dataset.cd-n));
+}
+
+/* ===== Student views ===== */
+V.map=()=>{
+  const[s,e]=cur(),seats=D.items.filter(i=>i.type=='seat'),zs=[...new Set(seats.map(i=>i.zone))];
+  const names={free:'Available',occ:'Occupied',sel:'Selected',mine:'Reserved by you',maint:'Under maintenance'};
+  const lg=Object.keys(names).map(k=>`<span><i class="dot ${k}"></i>${names[k]}</span>`).join('');
+  const z=zs.filter(x=>fz=='All'||x==fz).map(zn=>`<div class="card"><h3>${esc(zn)}</h3><div class="seats">${seats.filter(i=>i.zone==zn).map(i=>{let c=st(i,s,e);if(c=='free'&&sel==i.id)c='sel';return`<button class="seat ${c}" title="${esc(i.id+' | '+zn+' | '+i.am+' | '+names[c])}" onclick="pick('${i.id}')">${esc(i.id)}</button>`}).join('')}</div></div>`).join('');
+  const free=seats.filter(i=>st(i,s,e)=='free').length;
+  return`<div class="card"><div class="row">${ctrl()}<select aria-label="Zone" onchange="fz=this.value;render()">${['All',...zs].map(x=>`<option ${x==fz?'selected':''}>${esc(x)}</option>`).join('')}</select><b>${free} seats free</b></div><div class="legend">${lg}</div></div>${z}`
+   +(sel?`<div class="card row"><b>Selected: ${esc(sel)}</b><span class="mu">${esc(I(sel).zone)} — ${esc(I(sel).am)}</span><button class="btn" onclick="ask('${sel}')">Book this seat</button></div>`:'');
+};
+function pick(id){
+  const[s,e]=cur(),c=st(I(id),s,e);
+  if(c!='free')return toast(c=='mine'?'You have booked this seat':c=='maint'?'This seat is under maintenance':'This seat is occupied for the chosen slot','e');
+  if(me.role=='admin')return toast('Administrators view the map only. Manage seats under Seats & Resources.');
+  sel=id;render();
+}
+V.res=()=>{
+  const[s,e]=cur(),all=D.items.filter(i=>i.type=='res'),ty=[...new Set(all.map(i=>i.zone))],q=rf.q.toLowerCase();
+  const L=all.filter(i=>(!q||(i.name+i.zone+i.am).toLowerCase().includes(q))&&(!rf.ty||i.zone==rf.ty)).map(i=>({i,c:st(i,s,e)})).filter(x=>!rf.av||(rf.av=='free')==(x.c=='free'));
+  return`<div class="card"><div class="row">${ctrl()}<input type="search" placeholder="Search resources" aria-label="Search" value="${esc(rf.q)}" onchange="rf.q=this.value;render()"><select aria-label="Type" onchange="rf.ty=this.value;render()"><option value="">All types</option>${ty.map(x=>`<option ${x==rf.ty?'selected':''}>${esc(x)}</option>`).join('')}</select><select aria-label="Availability" onchange="rf.av=this.value;render()"><option value="">Any status</option><option value="free" ${rf.av=='free'?'selected':''}>Available</option><option value="no" ${rf.av=='no'?'selected':''}>Not available</option></select></div></div>`
+   +(L.length?`<div class="grid">${L.map(({i,c})=>`<div class="card"><h3>${esc(i.name)}</h3><p class="mu">${esc(i.zone)} · capacity ${i.cap}</p><p>${esc(i.am)}</p><div class="row" style="margin-top:10px"><span class="badge bg-${c=='free'?'g':c=='maint'?'y':'r'}">${c=='free'?'Available':c=='maint'?'Maintenance':'Booked'}</span>${c=='free'&&me.role!='admin'?`<button class="btn sm" onclick="ask('${i.id}')">Book</button>`:''}</div></div>`).join('')}</div>`:'<div class="card empty">No resources match these filters. Clear the search or change the filters.</div>');
+};
+const tbl=(h,r)=>`<div class="tw"><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map(x=>`<tr>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>${r.length?'':'<div class="empty">Nothing to show yet.</div>'}`;
+V.hist=()=>{
+  const L=D.bookings.filter(b=>b.uid==me.id).sort((a,b)=>b.start-a.start).filter(b=>(!bf.st||lab(b)[0]==bf.st)&&(!bf.dt||dstr(b.start)==bf.dt));
+  return`<div class="card"><h3>My bookings</h3><div class="row"><select aria-label="Status" onchange="bf.st=this.value;render()"><option value="">All statuses</option>${STS.map(x=>`<option ${x==bf.st?'selected':''}>${x}</option>`).join('')}</select><input type="date" aria-label="Date" value="${bf.dt}" onchange="bf.dt=this.value;render()"><button class="btn s sm" onclick="bf.st=bf.dt='';render()">Clear filters</button></div>${tbl(['Resource','Date','Time','Status','Check-in','Timer','Actions'],L.map(b=>{
+    const[l,c]=lab(b),cd=b.status=='checkedin'?['Ends in ',b.end]:b.status=='booked'?(Date.now()<b.start?['Starts in ',b.start]:['Check in within ',b.start+D.set.grace*M]):null;
+    const ac=(b.status=='booked'?`<button class="btn sm" onclick="act('in','${b.id}')">Check in</button> `:'')+(b.status=='checkedin'?`<button class="btn sm" onclick="act('ext','${b.id}')">Extend 1h</button> <button class="btn sm s" onclick="act('out','${b.id}')">Check out</button> `:'')+(live(b)?`<button class="btn sm d" onclick="act('can','${b.id}')">Cancel</button>`:'');
+    return[esc(nmOf(b.item)),dstr(b.start),tm(b.start)+'–'+tm(b.end),`<span class="badge bg-${c}">${l}</span>`,b.ci?tm(b.ci):'—',cd?`${cd[0]}<b data-cd="${cd[1]}">${fmtCd(cd[1]-Date.now())}</b>`:'—',ac||'—'];
+  }))}</div>`;
+};
+
+/* ===== Admin views ===== */
+V.dash=()=>{
+  const n=Date.now(),seats=D.items.filter(i=>i.type=='seat'),ok=seats.filter(i=>!i.maint),oc=ok.filter(i=>busy(i.id,n,n+1)).length;
+  const td=D.bookings.filter(b=>b.status!='cancelled'&&b.start<T(24,dstr())&&b.end>T(0,dstr())).length,pc=(a,b)=>b?Math.round(a/b*100):0;
+  const hrs=[];for(let h=D.set.open;h<D.set.close;h++)hrs.push([h,D.bookings.filter(b=>b.status!='cancelled'&&b.start<T(h+1,dstr())&&b.end>T(h,dstr())).length]);
+  const mx=Math.max(1,...hrs.map(x=>x[1])),pk=hrs.find(x=>x[1]==mx&&mx>0);
+  const zb=[...new Set(seats.map(i=>i.zone))].map(zn=>{const o=ok.filter(i=>i.zone==zn);const p=pc(o.filter(i=>busy(i.id,n,n+1)).length,o.length);return`<div class="hb"><span>${esc(zn)}</span><div class="track"><i style="width:${p}%"></i></div><b>${p}%</b></div>`}).join('');
+  return`<div class="grid" style="margin-bottom:16px">${[['Total seats',seats.length],['Occupied now',oc],['Available',ok.length-oc],['Bookings today',td],['Utilization',pc(oc,ok.length)+'%']].map(x=>`<div class="card stat"><b>${x[1]}</b>${x[0]}</div>`).join('')}</div>
+  <div class="card"><h3>Utilization by zone (now)</h3>${zb}</div>
+  <div class="card"><h3>Bookings per hour today ${pk?`<small>· peak at ${P(pk[0])}:00</small>`:''}</h3><div class="bars">${hrs.map(x=>`<div class="col">${x[1]}<div class="bar ${pk&&x[0]==pk[0]?'pk':''}" style="height:${x[1]/mx*100}%" title="${x[1]} bookings"></div>${x[0]}</div>`).join('')}</div></div>
+  <div class="card auth" style="max-width:none;margin:0 0 16px"><h3>Send announcement</h3><form class="row" onsubmit="return false" data-go="announce"><input name="m" required placeholder="Message to all students" style="flex:1;min-width:200px"><button type="button" class="btn" onclick="announce(this.form)">Send</button></form></div>`;
+};
+function announce(f){const m=el(f,'m').trim();if(!m){toast('Type a message first','e');return false}D.users.filter(u=>u.role!='admin').forEach(u=>note(u.id,'📢 '+m));toast('Announcement sent to all students','s');f.reset();return false}
+V.manage=()=>`<div class="card"><div class="row"><h3 style="margin:0">Seats & resources (${D.items.length})</h3><button class="btn" onclick="itemForm()">Add item</button></div>${tbl(['ID','Name','Type','Zone / category','Cap.','Amenities','Status','Actions'],D.items.map(i=>[esc(i.id),esc(i.name),i.type=='seat'?'Seat':'Resource',esc(i.zone),i.cap,esc(i.am),`<span class="badge bg-${i.maint?'y':'g'}">${i.maint?'Maintenance':'In service'}</span>`,`<button class="btn sm s" onclick="itemForm('${i.id}')">Edit</button> <button class="btn sm s" onclick="mt('${i.id}')">${i.maint?'Restore':'Maintenance'}</button> <button class="btn sm d" onclick="del('${i.id}')">Delete</button>`]))}</div>`;
+function itemForm(id){
+  const i=id?I(id):{type:'seat',name:'',zone:'',cap:1,am:''};
+  modal(`<h3>${id?'Edit':'Add'} item</h3><form onsubmit="return false" data-go="saveItem" data-arg="${id||''}"><label>Name / ID<input name="n" required value="${esc(i.name)}"></label><label>Type<select name="t"><option value="seat" ${i.type=='seat'?'selected':''}>Seat</option><option value="res" ${i.type=='res'?'selected':''}>Resource</option></select></label><label>Zone / category<input name="z" required placeholder="e.g. Silent Zone" value="${esc(i.zone)}"></label><label>Capacity<input name="c" type="number" min="1" value="${i.cap}"></label><label>Amenities<input name="a" value="${esc(i.am)}"></label><div class="row" style="margin-top:12px"><button type="button" class="btn" onclick="saveItem(this.form,'${id||''}')">Save item</button><button type="button" class="btn s" onclick="closeM()">Cancel</button></div></form>`);
+}
+function saveItem(f,id){
+  const v={name:el(f,'n').trim(),type:el(f,'t'),zone:el(f,'z').trim(),cap:+el(f,'c')||1,am:el(f,'a').trim()};
+  if(!v.name||!v.zone){toast('Enter a name and a zone or category','e');return false}
+  if(id)Object.assign(I(id),v);else{let k=v.name.toUpperCase().replace(/\s+/g,'');if(I(k))k+=Date.now()%1000;D.items.push({id:k,maint:false,...v})}
+  save();closeM();toast('Item saved','s');render();return false;
+}
+function mt(id){const i=I(id);i.maint=!i.maint;save();render()}
+function del(id){
+  if(!confirm('Delete '+nmOf(id)+'? Its active bookings will be cancelled.'))return;
+  D.bookings.forEach(b=>{if(b.item==id&&live(b)){b.status='cancelled';note(b.uid,`Booking cancelled: ${nmOf(id)} was removed`)}});
+  D.items=D.items.filter(i=>i.id!=id);save();render();
+}
+V.abk=()=>{
+  const q=ad.q.toLowerCase(),L=D.bookings.filter(b=>(!ad.st||lab(b)[0]==ad.st)&&(!q||(b.uid+(U(b.uid)||{name:''}).name+nmOf(b.item)).toLowerCase().includes(q))).sort((a,b)=>b.start-a.start);
+  return`<div class="card"><h3>All bookings</h3><div class="row"><input type="search" placeholder="Search student or item" aria-label="Search" value="${esc(ad.q)}" onchange="ad.q=this.value;render()"><select aria-label="Status" onchange="ad.st=this.value;render()"><option value="">All statuses</option>${STS.map(x=>`<option ${x==ad.st?'selected':''}>${x}</option>`).join('')}</select><button class="btn s" onclick="csv()">Export CSV</button></div>${tbl(['Student','Item','Date','Time','Status','Action'],L.map(b=>{const[l,c]=lab(b);return[esc((U(b.uid)||{name:b.uid}).name),esc(nmOf(b.item)),dstr(b.start),tm(b.start)+'–'+tm(b.end),`<span class="badge bg-${c}">${l}</span>`,live(b)?`<button class="btn sm d" onclick="act('rel','${b.id}')">Force release</button>`:'—']}))}</div>`;
+};
+function csv(){
+  const r=[['ID','Student','Item','Date','Start','End','Status','Check-in']].concat(D.bookings.map(b=>[b.id,b.uid,nmOf(b.item),dstr(b.start),tm(b.start),tm(b.end),lab(b)[0],b.ci?tm(b.ci):'']));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.map(x=>x.map(c=>'"'+c+'"').join(',')).join('\n')],{type:'text/csv'}));a.download='bookings-'+dstr()+'.csv';a.click();
+}
+V.stu=()=>`<div class="card"><h3>Students</h3>${tbl(['ID','Name','Email','Active bookings','Status','Action'],D.users.filter(u=>u.role!='admin').map(u=>[esc(u.id),esc(u.name),esc(u.email),D.bookings.filter(b=>b.uid==u.id&&live(b)).length,`<span class="badge bg-${u.blocked?'r':'g'}">${u.blocked?'Blocked':'Active'}</span>`,`<button class="btn sm ${u.blocked?'':'d'}" onclick="blk('${u.id}')">${u.blocked?'Unblock':'Block'}</button>`]))}</div>`;
+function blk(id){const u=U(id);u.blocked=!u.blocked;save();render()}
+V.set=()=>{
+  const S=D.set,f=(k,l,a,b)=>`<label>${l}<input name="${k}" type="number" min="${a}" max="${b}" value="${S[k]}" required></label>`;
+  return`<div class="card auth"><h3>System settings</h3><form onsubmit="return false" data-go="setS">${f('slot','Slot duration (hours)',1,4)}${f('grace','Check-in grace period (minutes)',1,60)}${f('max','Max active bookings per student',1,10)}${f('open','Opening hour (0–23)',0,23)}${f('close','Closing hour (1–24)',1,24)}<div class="row" style="margin-top:12px"><button type="button" class="btn" onclick="setS(this.form)">Save settings</button></div></form></div>`;
+};
+function setS(f){
+  const S={};['slot','grace','max','open','close'].forEach(k=>S[k]=+el(f,k));
+  if(S.slot<1||S.grace<1||S.max<1||S.close-S.open<S.slot){toast('Closing hour must leave room for at least one slot','e');return false}
+  D.set=S;sl='0';save();toast('Settings saved','s');render();return false;
+}
+
+/* ===== Shell & rendering ===== */
+function theme(){th=th=='dark'?'light':'dark';LS.s('lbs-th',th);render()}
+function render(){
+  document.documentElement.dataset.theme=th;
+  const N=me?(me.role=='admin'?[['dash','Dashboard'],['map','Seat Map'],['manage','Seats & Resources'],['abk','Bookings'],['stu','Students'],['set','Settings']]:[['map','Seat Map'],['res','Resources'],['hist','My Bookings']]):[];
+  $('#hd').innerHTML=`<span class="brand">📚 LibSeat</span><nav>${N.map(x=>`<button class="${view==x[0]?'on':''}" onclick="view='${x[0]}';np=false;sel=null;render()">${x[1]}</button>`).join('')}</nav>`+(me?`<button class="ic" title="Click to edit your name" aria-label="Edit your name" onclick="editName()">${esc(me.name)} ✏️</button><div class="bw">${bell()}</div>`:'')+`<button class="ic" aria-label="Toggle dark mode" onclick="theme()">${th=='dark'?'☀️':'🌙'}</button>`+(me?`<button class="btn sm s" onclick="logout()">Log out</button>`:'');
+  $('#mn').innerHTML=(me?V[view]:V.auth)();
+}
+try{D=JSON.parse(LS.g(K)||'null')}catch(e){D=null}if(!D||!D.items)seed();
+if(!D.v){D.v=2;D.set.max=Math.max(D.set.max,5);save()}
+fixSlot();
+me=U(D.session)||null;if(me&&me.blocked)me=null;
+view=me?(me.role=='admin'?'dash':'map'):'auth';
+document.addEventListener('keydown',e=>{const f=e.target.form;if(e.key=='Enter'&&e.target.tagName=='INPUT'&&f&&f.dataset.go){e.preventDefault();window[f.dataset.go](f,f.dataset.arg)}});
+render();tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
